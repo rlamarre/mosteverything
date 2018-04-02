@@ -1,22 +1,29 @@
-.container {
+.container_one {
     display: flex;
 }
 
 .smol {
-    height:100px;
+    max-width:150px;
+    max-height:75px;
+    padding: 10px;
+    padding-top: 10px;
+    vertical-align: middle;
+}
+.label {
+    verticle-align: middle;
 }
 
 .col {
+    border-style: dotted;
+    border-width: 2px;
+    margin: 20px;
+}
+
+div {
+    font-size: 12pt;
     text-align: center;
-    border-style: dashed;
-    margin:20px;
-    padding: 10px;
 }
 
-.heading {
-   
-}
-
-.section {
-    margin: 100px;
+p {
+    text-align: left;
 }

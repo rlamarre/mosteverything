@@ -1,8 +1,21 @@
 .container {
+    display: flex;
 }
 
 .smol {
+    max-width:250px;
+    max-height:150px;
+    padding: 10px;
+    padding-top: 20px;
 }
 
 .col {
+    border-style: dotted;
+    border-width: 2px;
+    margin: 20px;
+}
+
+div {
+    font-size: 18pt;
+    text-align: center;
 }
