@@ -11,9 +11,9 @@ function soften(f) {
         if(r !== "I do!") return "maybe";
         else return r;
     }
-    return ret;
 }
 
 var softAskOnADate = soften(askOnADate);
+
 console.log(softAskOnADate("Eric"));
 console.log(softAskOnADate("Bob"));

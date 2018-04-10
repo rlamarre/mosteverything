@@ -19,10 +19,29 @@ function reverseString(str) {
 }
 // Expand each of the following and get the result of the expression
 // #1
-square(decrement(square(decrement(3))))
+console.log(square(decrement(square(decrement(3)))));
+
+var z = decrement(3);
+var y = square(z);
+var x = decrement(y);
+console.log(square(x));
+
 // #2
 decrement(decrement(square(square(3))))
+var z = square(3);
+var y = square(z);
+var x = decrement(y);
+console.log(decrement(x))
+
 // #3
 duplicateString(reverseString("hello"))
+
+var rev = reverseString("hello");
+console.log(duplicateString(rev))
+
 // #4
 reverseString(duplicateString(duplicateString("foo")))
+
+var dup = duplicateString("foo");
+var dupTwo = duplicateString(dup);
+console.log(reverseString(dupTwo))

@@ -1,15 +1,15 @@
 What is the output of this program? Don't cheat by running it!
 
-function m(x) {
-    return x * 2;
+function m(x) { // x  = 3
+    return x * 2; // 3 * 2 = 6
 }
 
-function k(f, i, j) {
-    return f(i + 2) + j * 2;
+function k(f, i, j) { // f = m, i = 1, j = 4
+    return f(i + 2) + j * 2; // m(1 + 2) + 4 * 2; => 6 + 8 = 14
 }
 
-function f(g, h) {
-    return g(h, 1, 4);
+function f(g, h) { // g = k, h = m
+    return g(h, 1, 4); // k(m, 1, 4) => 14
 }
 
 console.log(f(k, m));

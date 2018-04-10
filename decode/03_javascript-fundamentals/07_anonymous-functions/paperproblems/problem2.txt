@@ -12,3 +12,14 @@ function call(f) {
 }
 
 call(greet);
+
+(function (f) { f("bob"); })( function (x) { console.log("hello " + x); })
+
+// do not do this
+// var callgreet = function (x) {console.log("hello " + x);}, function (f){ f("bob");}
+
+
+
+var callgreet = ((function (f) { f("bob"); })(); (function (x) { console.log("hello " = x); })();)
+
+(function (f) { f("bob"); })(function (x) { console.log("hello " + x);})
