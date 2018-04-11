@@ -1,0 +1,14 @@
+div {
+padding: 100px;
+background-color: blue;
+height: 800px;
+width: 800px
+}
+
+
+.appText {
+    color: yellow;
+    font-size: 24pt;
+    font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif
+}
+
