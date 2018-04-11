@@ -40,7 +40,9 @@ function startRound() {
 
     // * if this is included code doesn't work*
 
-    // app.innerHTML = "Round has Started";
+    app.innerHTML = "Round has Started";
+    app.removeinnerHTML = "Round has Started";
+
 
     // play round
 
@@ -55,8 +57,8 @@ function startRound() {
     
     // document.addEventListener('click', loseGame);
 
-    // set timer on button click
-    document.addEventListener("click", setTimeout((loseGame), 1500));
+    // set timer 
+    setTimeout(loseGame, 1500);
 
 }
 
