@@ -1,6 +1,6 @@
 // This sectin contains some game constants. It is not super interesting
 var GAME_WIDTH = 375;
-var GAME_HEIGHT = 500;
+var GAME_HEIGHT = 700;
 
 var ENEMY_WIDTH = 75;
 var ENEMY_HEIGHT = 156;
@@ -12,10 +12,14 @@ var PLAYER_HEIGHT = 54;
 // These two constants keep us from using "magic numbers" in our code
 var LEFT_ARROW_CODE = 37;
 var RIGHT_ARROW_CODE = 39;
+var UP_ARROW_CODE = 38;
+var DOWN_ARROW_CODE = 40;
 
 // These two constants allow us to DRY
 var MOVE_LEFT = 'left';
 var MOVE_RIGHT = 'right';
+var MOVE_UP = 'up';
+var MOVE_DOWN = 'down';
 
 // Preload game images
 var images = {};
@@ -30,8 +34,18 @@ var images = {};
 
 
 // This section is where you will be doing most of your coding
-class Enemy {
+
+// Super Class
+
+class Entity {
+    render(ctx) {
+        ctx.drawImage(this.sprite, this.x, this.y);
+    }
+}
+
+class Enemy extends Entity {
     constructor(xPos) {
+        super()
         this.x = xPos;
         this.y = -ENEMY_HEIGHT;
         this.sprite = images['enemy.png'];
@@ -49,8 +63,9 @@ class Enemy {
     }
 }
 
-class Player {
+class Player extends Entity {
     constructor() {
+        super()
         this.x = 2 * PLAYER_WIDTH;
         this.y = GAME_HEIGHT - PLAYER_HEIGHT - 10;
         this.sprite = images['player.png'];
@@ -63,6 +78,12 @@ class Player {
         }
         else if (direction === MOVE_RIGHT && this.x < GAME_WIDTH - PLAYER_WIDTH) {
             this.x = this.x + PLAYER_WIDTH;
+        }
+        else if (direction === MOVE_UP && this.y > 0) {
+            this.y = this.y - PLAYER_HEIGHT;
+        } 
+        else if (direction === MOVE_DOWN && this.y < GAME_HEIGHT + PLAYER_HEIGHT) {
+            this.y = this.y + PLAYER_HEIGHT;
         }
     }
 
@@ -116,15 +137,15 @@ class Engine {
 
     // This method finds a random spot where there is no enemy, and puts one in there
     addEnemy() {
-        var enemySpots = GAME_WIDTH / ENEMY_WIDTH;
+        var enemySpots = GAME_WIDTH / ENEMY_WIDTH + 1;
 
-        var enemySpot;
+        var enemySpot = 0;
         // Keep looping until we find a free enemy spot at random
         while (!enemySpot || this.enemies[enemySpot]) {
             enemySpot = Math.floor(Math.random() * enemySpots);
         }
 
-        this.enemies[enemySpot] = new Enemy(enemySpot * ENEMY_WIDTH);
+        this.enemies[enemySpot] = new Enemy(enemySpot * ENEMY_WIDTH - ENEMY_WIDTH);
     }
 
     // This method kicks off the game
@@ -140,6 +161,12 @@ class Engine {
             else if (e.keyCode === RIGHT_ARROW_CODE) {
                 this.player.move(MOVE_RIGHT);
             }
+            else if (e.keyCode === UP_ARROW_CODE) {
+                this.player.move(MOVE_UP);
+            }
+            else if (e.keyCode === DOWN_ARROW_CODE) {
+                this.player.move(MOVE_DOWN);
+                }
         });
 
         this.gameLoop();
@@ -200,13 +227,27 @@ class Engine {
 
     isPlayerDead() {
         // TODO: fix this function!
-        return false;
+        // console.log("hey") console.log("hey");
+        // for (var i = 0; i = enemies.length; i++) {
+        //     if (enemy.x === player.x  || enemy.y === player.y) {
+        //         return true;
+        //     } else {
+
+        // return false;
+
+        var self = this
+        // console.log(this.enemies.some(function (el) {
+        //     return (el.x === self.player.x)
+        // }))
+ 
+        return this.enemies.some(function (enemy) {
+            return (enemy.x === self.player.x && enemy.y + ENEMY_HEIGHT > self.player.y)
+            && (enemy.y < self.player.y ) + ENEMY_HEIGHT/4
+        })
+ 
+        //return false;
     }
 }
-
-
-
-
 
 // This section will start the game
 var gameEngine = new Engine(document.getElementById('app'));
