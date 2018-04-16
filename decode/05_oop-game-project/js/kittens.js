@@ -31,10 +31,10 @@ var GAME_HEIGHT = 600;
 
 var ENEMY_WIDTH = 75;
 var ENEMY_HEIGHT = 50;
-var MAX_ENEMIES = 3;
+var MAX_ENEMIES = 4;
 
-var SNOWFL_WIDTH = 75;
-var SNOWFL_HEIGHT = 50;
+var SNOWFL_WIDTH = 30;
+var SNOWFL_HEIGHT = 30;
 var MAX_SNOWFL = 3;
 
 var BONUS_WIDTH = 75;
@@ -82,7 +82,7 @@ class Enemy extends Entity {
         this.sprite = images['enemy.png'];
 
         // Each enemy should have a different speed
-        this.speed = Math.random() / 1;
+        this.speed = Math.random() / 2.5;
     }
 
     update(timeDiff) {
@@ -102,6 +102,9 @@ class Snowflake extends Entity {
         this.sprite = images['snowflake.png']
         this.speed = Math.random() / 2 + 0.25;
     }
+    update(timeDiff) {
+        this.y = this.y + timeDiff * this.speed;
+    }
 }
 
 class Bonus extends Entity {
@@ -111,7 +114,7 @@ class Bonus extends Entity {
         this.y = -BONUS_HEIGHT;
         this.sprite = images['bonus.png']
         this.isTouched = false
-        this.speed = Math.random() / 2 + 0.25;
+        this.speed = Math.random() / 2;
     }
 
 
@@ -259,7 +262,7 @@ class Engine {
             snowflakeSpot = Math.floor(Math.random() * snowflakeSpots);
         }
 
-        this.snowflakes[snowflakeSpot] = new Bonus(snowflakeSpot * SNOWFL_WIDTH - SNOWFL_WIDTH);
+        this.snowflakes[snowflakeSpot] = new Snowflake(snowflakeSpot * SNOWFL_WIDTH - SNOWFL_WIDTH);
     }
     
     addBonus() {
@@ -319,8 +322,8 @@ class Engine {
         // Call update on all enemies
         this.enemies.forEach(enemy => enemy.update(timeDiff));
 
-        // Call update on all snowfalkes
-        this.snowflakes.forEach(snowflakes => snowlfakes.update(timeDiff));
+        // Call update on all snowflakes
+        this.snowflakes.forEach(snowflakes => snowflakes.update(timeDiff));
         
         // Call update on all bonuses
         this.bonuses.forEach(bonus => bonus.update(timeDiff));
@@ -331,7 +334,7 @@ class Engine {
         this.enemies.forEach(enemy => enemy.render(this.ctx)); // draw the enemies
         this.player.render(this.ctx); // draw the player
         this.bonuses.forEach(bonus => bonus.render(this.ctx));
-        this.snowflakes.forEach(snowflakes => snowlfakes.render(this.ctx))
+        this.snowflakes.forEach(snowflakes => snowflakes.render(this.ctx))
 
         // Text for bonus win points
 
@@ -368,11 +371,11 @@ class Engine {
 
         // Check if any snowflakes should disappear
         this.snowflakes.forEach((snowflakes, snowflakesIdx) => {
-            if (snowlfake.y > GAME_HEIGHT) {
-                delete this.snowflakes[snowflakeIdx];
+            if (snowflakes.y > GAME_HEIGHT) {
+                delete this.snowflakes[snowflakesIdx];
             }
         });
-        this.setupSnowflake();
+        this.setupSnowflakes();
 
         // Check if any bonuses should disappear
 
