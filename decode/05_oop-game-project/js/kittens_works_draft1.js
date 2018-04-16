@@ -1,21 +1,10 @@
-//var audio = document.createElement('audio');
-function sound() {
-    var audio = new Audio('audio/game_music.mp3');
-    audio.play();
-}
-
-
 // This sectin contains some game constants. It is not super interesting
 var GAME_WIDTH = 375;
 var GAME_HEIGHT = 600;
 
 var ENEMY_WIDTH = 75;
 var ENEMY_HEIGHT = 50;
-var MAX_ENEMIES = 3;
-
-var BONUS_WIDTH = 75;
-var BONUS_HEIGHT = 75;
-var MAX_BONUS = 1;
+var MAX_ENEMIES = 4;
 
 var PLAYER_WIDTH = 75;
 var PLAYER_HEIGHT = 54;
@@ -34,11 +23,16 @@ var MOVE_DOWN = 'down';
 
 // Preload game images
 var images = {};
-['enemy.png', 'stars.png', 'player.png', 'bonus.png'].forEach(imgName => {
+['enemy.png', 'stars.png', 'player.png'].forEach(imgName => {
     var img = document.createElement('img');
     img.src = 'images/' + imgName;
     images[imgName] = img;
 });
+
+var audio = new Audio('game_music.m4a');
+audio.play();
+
+
 
 // This section is where you will be doing most of your coding
 
@@ -58,25 +52,6 @@ class Enemy extends Entity {
         this.sprite = images['enemy.png'];
 
         // Each enemy should have a different speed
-        this.speed = Math.random() / 1 ;
-    }
-
-    update(timeDiff) {
-        this.y = this.y + timeDiff * this.speed;
-    }
-
-    render(ctx) {
-        ctx.drawImage(this.sprite, this.x, this.y);
-    }
-}
-
-class Bonus extends Entity {
-    constructor(xPos) {
-        super()
-        this.x = xPos;
-        this.y = -BONUS_HEIGHT;
-        this.sprite = images['bonus.png']
-
         this.speed = Math.random() / 2 + 0.25;
     }
 
@@ -107,7 +82,7 @@ class Player extends Entity {
         }
         else if (direction === MOVE_UP && this.y > 0) {
             this.y = this.y - PLAYER_HEIGHT;
-        }
+        } 
         else if (direction === MOVE_DOWN && this.y < GAME_HEIGHT + PLAYER_HEIGHT) {
             this.y = this.y + PLAYER_HEIGHT;
         }
@@ -135,9 +110,6 @@ class Engine {
         // Setup enemies, making sure there are always three
         this.setupEnemies();
 
-        // Setup Bonuses, making sure there is only 1
-        this.setupBonus();
-
         // Setup the <canvas> element where we will be drawing
         var canvas = document.createElement('canvas');
         canvas.width = GAME_WIDTH;
@@ -164,16 +136,6 @@ class Engine {
         }
     }
 
-    setupBonus() {
-        if (!this.bonuses) {
-            this.bonuses = [];
-        }
-
-        while (this.bonuses.filter(e => !!e).length < MAX_BONUS) {
-            this.addBonus();
-        }
-    }
-
     // This method finds a random spot where there is no enemy, and puts one in there
     addEnemy() {
         var enemySpots = GAME_WIDTH / ENEMY_WIDTH + 1;
@@ -187,22 +149,10 @@ class Engine {
         this.enemies[enemySpot] = new Enemy(enemySpot * ENEMY_WIDTH - ENEMY_WIDTH);
     }
 
-    addBonus() {
-        var bonusSpots = GAME_WIDTH / BONUS_WIDTH + 1;
-        var bonusSpot = 0;
-        // Keep looping until we find a free enemy spot at random
-        while (!bonusSpot || this.bonuses[bonusSpot]) {
-            bonusSpot = Math.floor(Math.random() * bonusSpots);
-        }
-
-        this.bonuses[bonusSpot] = new Bonus(bonusSpot * BONUS_WIDTH - BONUS_WIDTH);
-    }
-
     // This method kicks off the game
     start() {
         this.score = 0;
         this.lastFrame = Date.now();
-        sound();
 
         // Listen for keyboard left/right and update the player
         document.addEventListener('keydown', e => {
@@ -217,7 +167,7 @@ class Engine {
             }
             else if (e.keyCode === DOWN_ARROW_CODE) {
                 this.player.move(MOVE_DOWN);
-            }
+                }
         });
 
         this.gameLoop();
@@ -244,15 +194,10 @@ class Engine {
         // Call update on all enemies
         this.enemies.forEach(enemy => enemy.update(timeDiff));
 
-        // Call update on all bonuses
-        this.bonuses.forEach(bonus => bonus.update(timeDiff));
-
-
         // Draw everything!
         this.ctx.drawImage(images['stars.png'], 0, 0); // draw the star bg
         this.enemies.forEach(enemy => enemy.render(this.ctx)); // draw the enemies
         this.player.render(this.ctx); // draw the player
-        this.bonuses.forEach(bonus => bonus.render(this.ctx))
 
         // Check if any enemies should die
         this.enemies.forEach((enemy, enemyIdx) => {
@@ -262,19 +207,6 @@ class Engine {
         });
         this.setupEnemies();
 
-        // Check if any bonuses should disappear
-
-        this.bonuses.forEach((bonus, bonusIdx) => {
-            if (bonus.y > GAME_HEIGHT) {
-                delete this.bonuses[bonusIdx];
-            }
-        });
-
-        this.setupBonus();
-
-        // check if player is eating
-
-
         // Check if player is dead
         if (this.isPlayerDead()) {
             // If they are dead, then it's game over!
@@ -282,58 +214,39 @@ class Engine {
             this.ctx.fillStyle = '#ffffff';
             this.ctx.fillText(this.score + ' GAME OVER', 5, 30);
         }
-
         else {
-
-            if (this.isPlayerEating()) {
-                // If they are eating they get a bonus!
-                this.ctx.font = 'bold 30px Impact';
-                this.ctx.fillStyle = '#FFCC00';
-                this.ctx.fillText(this.score + ' YUM *** + 250 pts + ***', 5, 30);
-                console.log("first score :", this.score);
-                this.score += 250;
-                console.log("second score :", this.score);
-
-            }
-
             // If player is not dead, then draw the score
             this.ctx.font = 'bold 30px Impact';
             this.ctx.fillStyle = '#ffffff';
             this.ctx.fillText(this.score, 5, 30);
 
-
             // Set the time marker and redraw
             this.lastFrame = Date.now();
             requestAnimationFrame(this.gameLoop);
         }
-
-
-    }
-
-    isPlayerEating() {
-
-        var self = this
-
-        return this.bonuses.some(function (bonus) {
-            var bonusAndPlayerInSameColumn = bonus.x === self.player.x
-            var bonusReachedPlayer = (bonus.y + BONUS_HEIGHT) >= self.player.y
-            var bonusIsPassedPlayer = bonus.y > (self.player.y + PLAYER_HEIGHT)
-            return bonusAndPlayerInSameColumn && bonusReachedPlayer && !bonusIsPassedPlayer
-        })
     }
 
     isPlayerDead() {
+        // TODO: fix this function!
+        // console.log("hey") console.log("hey");
+        // for (var i = 0; i = enemies.length; i++) {
+        //     if (enemy.x === player.x  || enemy.y === player.y) {
+        //         return true;
+        //     } else {
+
+        // return false;
 
         var self = this
-
+        // console.log(this.enemies.some(function (el) {
+        //     return (el.x === self.player.x)
+        // }))
+ 
         return this.enemies.some(function (enemy) {
-            var enemyAndPlayerInSameColumn = enemy.x === self.player.x
-            var enemyReachedPlayer = (enemy.y + ENEMY_HEIGHT) >= self.player.y
-            var enemyIsPassedPlayer = enemy.y > (self.player.y + PLAYER_HEIGHT)
-            // var removeMusic =  () => remove sound;
-
-            return enemyAndPlayerInSameColumn && enemyReachedPlayer && !enemyIsPassedPlayer;
+            return (enemy.x === self.player.x && enemy.y + ENEMY_HEIGHT > self.player.y)
+            && (enemy.y < self.player.y ) + ENEMY_HEIGHT/4
         })
+ 
+        //return false;
     }
 }
 
