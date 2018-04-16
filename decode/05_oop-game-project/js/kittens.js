@@ -31,7 +31,11 @@ var GAME_HEIGHT = 600;
 
 var ENEMY_WIDTH = 75;
 var ENEMY_HEIGHT = 50;
-var MAX_ENEMIES = 4;
+var MAX_ENEMIES = 3;
+
+var SNOWFL_WIDTH = 75;
+var SNOWFL_HEIGHT = 50;
+var MAX_SNOWFL = 3;
 
 var BONUS_WIDTH = 75;
 var BONUS_HEIGHT = 50;
@@ -94,8 +98,9 @@ class Snowflake extends Entity {
     constructor(xPos) {
         super()
         this.x = xPos;
-        this.y = -ENEMY_HEIGHT;
-        this.sprite = images['snowflake.png'];
+        this.y = -SNOWFL_HEIGHT;
+        this.sprite = images['snowflake.png']
+        this.speed = Math.random() / 2 + 0.25;
     }
 }
 
@@ -108,6 +113,7 @@ class Bonus extends Entity {
         this.isTouched = false
         this.speed = Math.random() / 2 + 0.25;
     }
+
 
     touched() {
         this.isTouched = true
@@ -180,6 +186,11 @@ class Engine {
         // Setup Bonuses, making sure there is only 1
         this.setupBonus();
 
+        // Setup Snowflakes
+
+        this.setupSnowflakes();
+
+
         // Setup the <canvas> element where we will be drawing
         var canvas = document.createElement('canvas');
         canvas.id = 'canvas';
@@ -207,6 +218,16 @@ class Engine {
         }
     }
 
+    setupSnowflakes() {
+        if(!this.snowflakes) {
+            this.snowflakes = [];
+        }
+
+        while (this.snowflakes.filter(e => !!e).length < MAX_SNOWFL) {
+            this.addSnowflake();
+        }
+    }
+
     setupBonus() {
         if (!this.bonuses) {
             this.bonuses = [];
@@ -230,6 +251,17 @@ class Engine {
         this.enemies[enemySpot] = new Enemy(enemySpot * ENEMY_WIDTH - ENEMY_WIDTH);
     }
 
+    addSnowflake() {
+        var snowflakeSpots = GAME_WIDTH / SNOWFL_WIDTH + 1;
+        var snowflakeSpot = 0;
+        // Keep looping until we find a free enemy spot at random
+        while (!snowflakeSpot || this.snowflakes[snowflakeSpot]) {
+            snowflakeSpot = Math.floor(Math.random() * snowflakeSpots);
+        }
+
+        this.snowflakes[snowflakeSpot] = new Bonus(snowflakeSpot * SNOWFL_WIDTH - SNOWFL_WIDTH);
+    }
+    
     addBonus() {
         var bonusSpots = GAME_WIDTH / BONUS_WIDTH + 1;
         var bonusSpot = 0;
@@ -287,6 +319,9 @@ class Engine {
         // Call update on all enemies
         this.enemies.forEach(enemy => enemy.update(timeDiff));
 
+        // Call update on all snowfalkes
+        this.snowflakes.forEach(snowflakes => snowlfakes.update(timeDiff));
+        
         // Call update on all bonuses
         this.bonuses.forEach(bonus => bonus.update(timeDiff));
 
@@ -295,8 +330,8 @@ class Engine {
         this.ctx.drawImage(images['stars.png'], 0, 0); // draw the star bg
         this.enemies.forEach(enemy => enemy.render(this.ctx)); // draw the enemies
         this.player.render(this.ctx); // draw the player
-        this.bonuses.forEach(bonus => bonus.render(this.ctx))
-
+        this.bonuses.forEach(bonus => bonus.render(this.ctx));
+        this.snowflakes.forEach(snowflakes => snowlfakes.render(this.ctx))
 
         // Text for bonus win points
 
@@ -331,6 +366,13 @@ class Engine {
         });
         this.setupEnemies();
 
+        // Check if any snowflakes should disappear
+        this.snowflakes.forEach((snowflakes, snowflakesIdx) => {
+            if (snowlfake.y > GAME_HEIGHT) {
+                delete this.snowflakes[snowflakeIdx];
+            }
+        });
+        this.setupSnowflake();
 
         // Check if any bonuses should disappear
 
